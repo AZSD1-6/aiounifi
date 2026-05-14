@@ -1,14 +1,14 @@
 package com.anthropic.claudemonitor.util
 
-import java.text.NumberFormat
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
-private val numberFormat = NumberFormat.getNumberInstance(Locale.US)
-private val dtFormatter = DateTimeFormatter.ofPattern("MMM d, HH:mm").withZone(ZoneId.systemDefault())
-private val dateFormatter = DateTimeFormatter.ofPattern("MMM d").withZone(ZoneId.systemDefault())
+private val dtFmt   = SimpleDateFormat("MMM d, HH:mm", Locale.US)
+private val dateFmt = SimpleDateFormat("MMM d", Locale.US)
+private val isoFmt  = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).also {
+    it.timeZone = TimeZone.getTimeZone("UTC")
+}
 
 fun Long.formatTokens(): String = when {
     this >= 1_000_000L -> "%.1fM".format(this / 1_000_000.0)
@@ -27,14 +27,16 @@ fun Double.formatCostShort(): String = when {
 fun String?.formatDateTime(): String {
     if (this.isNullOrBlank()) return "—"
     return try {
-        dtFormatter.format(Instant.parse(this))
+        val clean = this.substringBefore("+").replace("Z", "").trimEnd()
+        dtFmt.format(isoFmt.parse(clean) ?: return this)
     } catch (_: Exception) { this }
 }
 
 fun String?.formatDate(): String {
     if (this.isNullOrBlank()) return "—"
     return try {
-        dateFormatter.format(Instant.parse(this))
+        val clean = this.substringBefore("+").replace("Z", "").trimEnd()
+        dateFmt.format(isoFmt.parse(clean) ?: return this)
     } catch (_: Exception) { this }
 }
 
