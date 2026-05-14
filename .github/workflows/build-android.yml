@@ -1,0 +1,61 @@
+name: Build Claude Monitor APK
+
+on:
+  push:
+    branches:
+      - claude/android-usage-monitor-app-AwvZb
+    paths:
+      - 'claude-usage-monitor-android/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Install required SDK components
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Make gradlew executable
+        working-directory: claude-usage-monitor-android
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        working-directory: claude-usage-monitor-android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeMonitor-debug
+          path: claude-usage-monitor-android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
+      - name: Build Release APK (unsigned)
+        working-directory: claude-usage-monitor-android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeMonitor-release-unsigned
+          path: claude-usage-monitor-android/app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 7
