@@ -31,8 +31,7 @@ jobs:
         run: yes | sdkmanager --licenses || true
 
       - name: Install required SDK components
-        run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Make gradlew executable
         working-directory: claude-usage-monitor-android

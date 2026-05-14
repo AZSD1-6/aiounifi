@@ -5,13 +5,12 @@ plugins {
 
 android {
     namespace = "com.anthropic.claudemonitor"
-    compileSdk = 23
-    buildToolsVersion = "29.0.3"
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.anthropic.claudemonitor"
-        minSdk = 23
-        targetSdk = 23
+        minSdk = 26
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
     }
@@ -21,7 +20,8 @@ android {
             isDebuggable = true
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
