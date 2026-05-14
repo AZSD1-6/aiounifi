@@ -1,0 +1,5 @@
+-keep class com.anthropic.claudemonitor.data.models.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**
