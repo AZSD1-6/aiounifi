@@ -74,3 +74,4 @@ venv.bak/
 #Jetbrains
 .idea
 claude-usage-monitor-android/.gradle/
+claude-usage-monitor-android/local.properties
