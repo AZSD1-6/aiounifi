@@ -2,49 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="Server">
-
-        <EditTextPreference
-            android:key="server_url"
-            android:title="Server URL"
-            android:summary="http://&lt;your-mac-ip&gt;:8765"
-            android:defaultValue="http://192.168.1.100:8765"
-            android:inputType="textUri"
-            app:useSimpleSummaryProvider="true" />
-
-        <Preference
-            android:key="test_connection"
-            android:title="Test Connection"
-            android:summary="Tap to verify connectivity to the server" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Claude Max Plan">
-
-        <ListPreference
-            android:key="plan_tier"
-            android:title="Plan Tier"
-            android:entries="@array/plan_tier_entries"
-            android:entryValues="@array/plan_tier_values"
-            android:defaultValue="max5x"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            android:key="billing_start"
-            android:title="Billing Start Date"
-            android:summary="YYYY-MM-DD (e.g. 2026-05-01)"
-            android:inputType="date"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            android:key="plan_limit"
-            android:title="Custom Token Limit"
-            android:summary="Leave blank to use plan defaults"
-            android:inputType="number"
-            app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="Display">
 
         <ListPreference

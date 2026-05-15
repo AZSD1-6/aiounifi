@@ -24,6 +24,12 @@
         </activity>
 
         <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.ClaudeMonitor" />
+
+        <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/title_settings" />

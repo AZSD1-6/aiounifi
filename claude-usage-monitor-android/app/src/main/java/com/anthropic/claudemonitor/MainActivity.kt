@@ -9,7 +9,9 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.anthropic.claudemonitor.data.auth.ClaudeAiRepository
 import com.anthropic.claudemonitor.databinding.ActivityMainBinding
+import com.anthropic.claudemonitor.ui.login.LoginActivity
 import com.anthropic.claudemonitor.ui.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +20,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Redirect to login if not authenticated
+        if (!ClaudeAiRepository(this).isLoggedIn) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
@@ -39,10 +49,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_settings) {
-            startActivity(Intent(this, SettingsActivity::class.java))
-            return true
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            R.id.action_logout -> {
+                ClaudeAiRepository(this).logout()
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 }

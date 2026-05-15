@@ -5,11 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.anthropic.claudemonitor.data.api.ApiClientFactory
 import com.anthropic.claudemonitor.data.api.Result
-import com.anthropic.claudemonitor.data.api.UsageRepository
-import com.anthropic.claudemonitor.data.models.Stats
-import com.anthropic.claudemonitor.util.Prefs
+import com.anthropic.claudemonitor.data.auth.ClaudeAiRepository
+import com.anthropic.claudemonitor.data.auth.SessionManager
+import com.anthropic.claudemonitor.data.models.UsageLimits
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -17,8 +16,10 @@ import kotlinx.coroutines.launch
 
 class DashboardViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val _stats = MutableLiveData<Stats?>()
-    val stats: LiveData<Stats?> = _stats
+    private val repo = ClaudeAiRepository(app)
+
+    private val _usage = MutableLiveData<UsageLimits?>()
+    val usage: LiveData<UsageLimits?> = _usage
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
@@ -26,15 +27,20 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
+    private val _sessionExpired = MutableLiveData(false)
+    val sessionExpired: LiveData<Boolean> = _sessionExpired
+
+    val userEmail: String?
+        get() = SessionManager.getInstance(getApplication()).userEmail
+
     private var pollJob: Job? = null
 
-    fun startPolling() {
+    fun startPolling(intervalSeconds: Int = 30) {
         pollJob?.cancel()
         pollJob = viewModelScope.launch {
             while (isActive) {
                 refresh()
-                val interval = Prefs.refreshSeconds(getApplication()) * 1000L
-                delay(interval)
+                delay(intervalSeconds * 1000L)
             }
         }
     }
@@ -43,11 +49,15 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
-            val ctx = getApplication<Application>()
-            val repo = UsageRepository(ApiClientFactory.create(Prefs.serverUrl(ctx)))
-            when (val result = repo.getStats(Prefs.billingStart(ctx), Prefs.planLimit(ctx))) {
-                is Result.Success -> _stats.value = result.data
-                is Result.Error   -> _error.value = result.message
+            when (val result = repo.getUsage()) {
+                is Result.Success -> _usage.value = result.data
+                is Result.Error   -> {
+                    if (result.message.contains("Session expired", ignoreCase = true)) {
+                        _sessionExpired.value = true
+                    } else {
+                        _error.value = result.message
+                    }
+                }
             }
             _loading.value = false
         }

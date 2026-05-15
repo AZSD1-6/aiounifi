@@ -57,4 +57,5 @@ dependencies {
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.security.crypto)
 }
