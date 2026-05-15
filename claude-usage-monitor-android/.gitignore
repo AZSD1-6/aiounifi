@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local config (machine-specific)
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Keys & secrets
+*.jks
+*.keystore
+*.p12
+
+# OS
+.DS_Store
+Thumbs.db
